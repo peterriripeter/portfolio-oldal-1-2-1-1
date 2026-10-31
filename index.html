@@ -699,9 +699,9 @@
     .tags .tag-unreal  { background: #0a0a0a; color: #ffffff; }
     .tags .tag-adobe   { background: #FA0C00; color: #ffffff; }
     .tags .tag-maya    { background: #16A8CB; color: #ffffff; }
-    .chip { background: #fff; border: 2px solid #0a0a0a; color: #0a0a0a; }
+    .chip { background: #fff; border: .12em solid #0a0a0a; color: #0a0a0a; } /* a keret a betűmérettel arányos */
     .chip[aria-pressed="true"] { background: #0a0a0a; border-color: #0a0a0a; color: #fff; }
-    .chip:hover, .chip[aria-pressed="true"]:hover { border-color: #2aa7d8; box-shadow: 0 0 0 2px #2aa7d8; }
+    .chip:hover, .chip[aria-pressed="true"]:hover { border-color: #2aa7d8; box-shadow: 0 0 0 .12em #2aa7d8; }
     .lc .logo { background: #0a0a0a; }
     .card .box { background: #d8dfe3; }
     .card .box::before { background-image: linear-gradient(rgba(10,10,10,.12) 1px, transparent 1px), linear-gradient(90deg, rgba(10,10,10,.12) 1px, transparent 1px); }
@@ -761,8 +761,10 @@
         grid-template-columns: 1fr;
         grid-template-rows: auto auto;
         align-content: center;
-        gap: 3rem;
-        min-height: 0;
+        gap: 1.5rem;
+        height: auto;
+        min-height: calc(100svh - var(--nav-h, 56px));
+        padding: 1.5rem 5vw 4rem;
         text-align: center;
       }
       #about p {
@@ -1325,6 +1327,8 @@
       }
 
       var c = new THREE.OrbitControls(cam, canvas);
+      // A portré modellen a húzás csak forgat, nem görgeti az oldalt (így nem ugrál a kártya és a menü)
+      if (el.closest('.stage')) canvas.style.touchAction = 'none';
       c.enableDamping = true;
       c.enablePan = false;
       c.autoRotate = true;
