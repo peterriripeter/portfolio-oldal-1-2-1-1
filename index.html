@@ -624,7 +624,7 @@
 
     .chips {
       display: flex;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       gap: .6rem;
       justify-content: center;
       margin: 2rem 0 1.5rem;
@@ -835,6 +835,8 @@
     /* Javítások: nyelvváltó gomb, videókártyák igazítása, logókártyák szövege */
     #lang-btn { white-space: nowrap; flex-shrink: 0; }
     nav > * { flex-shrink: 0; }
+    /* Asztali nézetben a wrapper nem változtatja meg a nav elemek elrendezését. */
+    .nav-links { display: contents; }
 
     .thumbs { align-items: stretch; grid-auto-rows: 1fr; }
     .thumb {
@@ -857,24 +859,43 @@
 
     /* Telefon: a menüsáv két sorba rendeződik, így nem lóg le a képernyőről */
     @media (max-width: 620px) {
-      /* Rács: felső sor = név (balra), Get in touch (pontosan középen), EN/HU (jobbra); alsó sor = 4 menüpont */
+      /* A felső sor három része: név | a két gomb közötti közép | nyelvváltó. */
       nav {
         display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        grid-template-rows: auto auto;
         align-items: center;
         gap: .55rem .3rem;
         padding: .6rem 5vw;
       }
       nav::after { display: none; }
-      nav a.brand { margin-right: 0; grid-row: 1; grid-column: 1 / 3; justify-self: start; }
-      nav a.cta { grid-row: 1; grid-column: 1 / -1; justify-self: center; padding: .25rem .8rem; font-size: .85rem; letter-spacing: .03em; }
-      #lang-btn { grid-row: 1; grid-column: 3 / 5; justify-self: end; }
-      nav a:not(.brand):not(.cta) { grid-row: 2; justify-self: center; font-size: .85rem; letter-spacing: .03em; }
+      nav a.brand { margin-right: 0; grid-row: 1; grid-column: 1; justify-self: start; }
+      .nav-links {
+        display: grid;
+        grid-row: 2;
+        grid-column: 1 / -1;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        align-items: center;
+        min-width: 0;
+      }
+      nav a.cta { grid-row: 1; grid-column: 2; justify-self: center; padding: .25rem .8rem; font-size: .85rem; letter-spacing: .03em; }
+      #lang-btn { grid-row: 1; grid-column: 3; justify-self: end; }
+      .nav-links a { justify-self: center; font-size: .85rem; letter-spacing: .03em; }
       /* A második sor a görgetéssel együtt mozog: a --np (0–1) változót a JS állítja */
       nav { overflow: hidden; }
-      nav a:not(.brand):not(.cta) { opacity: clamp(0, calc(1 - var(--np, 0) * 1.6), 1); transform: translateY(calc(var(--np, 0) * -14px)); }
-      nav.row-gone a:not(.brand):not(.cta) { visibility: hidden; pointer-events: none; }
-      nav.measure a:not(.brand):not(.cta) { display: none; }
+      nav .nav-links a { opacity: clamp(0, calc(1 - var(--np, 0) * 1.6), 1); transform: translateY(calc(var(--np, 0) * -14px)); }
+      nav.row-gone .nav-links a { visibility: hidden; pointer-events: none; }
+      nav.measure .nav-links a { display: none; }
+
+      /* A What can I do opciói szűk kijelzőn is egy sorban maradnak. */
+      .chips { flex-wrap: nowrap; gap: .3rem; }
+      .chip {
+        flex: 0 0 auto;
+        min-width: 0;
+        white-space: nowrap;
+        padding: .28rem clamp(.48rem, 2vw, .65rem);
+        font-size: clamp(.74rem, 3vw, .82rem);
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -891,10 +912,12 @@
   <!-- Navigáció -->
   <nav>
     <a class="brand" href="#about" data-en="PÉTER EGRI" data-hu="EGRI PÉTER">PÉTER EGRI</a>
-    <a href="#art" data-en="3D Art" data-hu="3D Munkák">3D Art</a>
-    <a href="#logo" data-en="Logos" data-hu="Logók">Logos</a>
-    <a href="#video" data-en="Filming" data-hu="Videózás">Filming</a>
-    <a href="#other" data-en="Other" data-hu="Egyéb">Other</a>
+    <div class="nav-links">
+      <a href="#art" data-en="3D Art" data-hu="3D Munkák">3D Art</a>
+      <a href="#logo" data-en="Logos" data-hu="Logók">Logos</a>
+      <a href="#video" data-en="Filming" data-hu="Videózás">Filming</a>
+      <a href="#other" data-en="Other" data-hu="Egyéb">Other</a>
+    </div>
     <a class="cta" href="#hire" data-en="Get in touch" data-hu="Kapcsolat">Get in touch</a>
     <button id="lang-btn">EN / HU</button>
   </nav>
