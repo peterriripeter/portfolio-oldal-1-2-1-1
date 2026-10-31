@@ -871,23 +871,22 @@
         padding: .6rem 5vw;
       }
       nav::after { display: none; }
-      nav a.brand { margin-right: 0; grid-row: 1; grid-column: 1; justify-self: start; }
+      nav a.brand { margin-right: 0; grid-row: 2; grid-column: 1; justify-self: start; }
       .nav-links {
         display: grid;
-        grid-row: 2;
+        grid-row: 1;
         grid-column: 1 / -1;
         grid-template-columns: repeat(4, minmax(0, 1fr));
         align-items: center;
         min-width: 0;
       }
-      nav a.cta { grid-row: 1; grid-column: 2; justify-self: center; padding: .25rem .8rem; font-size: .85rem; letter-spacing: .03em; }
-      #lang-btn { grid-row: 1; grid-column: 3; justify-self: end; }
+      nav a.cta { grid-row: 2; grid-column: 2; justify-self: center; padding: .25rem .8rem; font-size: .85rem; letter-spacing: .03em; }
+      #lang-btn { grid-row: 2; grid-column: 3; justify-self: end; }
       .nav-links a { justify-self: center; font-size: .85rem; letter-spacing: .03em; }
-      /* A második sor a görgetéssel együtt mozog: a --np (0–1) változót a JS állítja */
-      nav { overflow: hidden; }
-      nav .nav-links a { opacity: clamp(0, calc(1 - var(--np, 0) * 1.6), 1); transform: translateY(calc(var(--np, 0) * -14px)); }
-      nav.row-gone .nav-links a { visibility: hidden; pointer-events: none; }
-      nav.measure .nav-links a { display: none; }
+      /* A linkek sora van felül: a menüsáv negatív "top" értékkel tapad, így görgetéskor a linkek sora
+         magától kicsúszik, a név és a gombok sora pedig marad. Nincs JS-es méretezés, ezért iPhone-on
+         a böngésző alsó sávjának ki-be csúszása sem tudja összezavarni. */
+      nav { overflow: hidden; top: var(--nav-top, -42px); }
 
       /* A What can I do opciói szűk kijelzőn is egy sorban maradnak. */
       .chips { flex-wrap: nowrap; gap: .3rem; }
@@ -1432,53 +1431,20 @@
       size();
     }
 
-    // A menüsáv tényleges magassága (telefonon két soros), ehhez igazodik a nyitóblokk és az ugrás
+    // A menüsáv magassága (telefonon két soros) és a tapadási eltolás (a linkek sora kicsúszik görgetéskor)
     (function() {
-      var nav = document.querySelector('nav');
-      var collapsed = false;
-      function setNavH() { if (!collapsed) document.documentElement.style.setProperty('--nav-h', nav.offsetHeight + 'px'); }
-      setNavH();
-      new ResizeObserver(setNavH).observe(nav);
-      if (document.fonts && document.fonts.ready) document.fonts.ready.then(setNavH);
-
-      // Telefonon a menü második sora a görgetéssel együtt csúszik fel és halványul el:
-      // a "Scroll down" jelzés eltűnésénél (scrollY = 40) indul, és START + RANGE görgetésnél tűnik el teljesen.
-      // A negatív alsó margó miatt a tartalom közben nem mozdul el.
-      var START = 40, RANGE = 1000;
-      var mq = window.matchMedia('(max-width: 620px)');
-      var h0 = 0, h1 = 0;
-      function measure() {
-        nav.style.height = ''; nav.style.marginBottom = '';
-        h0 = nav.offsetHeight;
-        nav.classList.add('measure');
-        h1 = nav.offsetHeight;
-        nav.classList.remove('measure');
+      var nav = document.querySelector('nav'),
+          lang = document.getElementById('lang-btn'),
+          mq = window.matchMedia('(max-width: 620px)');
+      function setNav() {
+        document.documentElement.style.setProperty('--nav-h', nav.offsetHeight + 'px');
+        if (mq.matches) document.documentElement.style.setProperty('--nav-top', -(lang.offsetTop - 6) + 'px');
+        else document.documentElement.style.removeProperty('--nav-top');
       }
-      function applyProgress() {
-        var p = mq.matches ? Math.min(1, Math.max(0, (window.scrollY - START) / RANGE)) : 0;
-        if (p === 0) {
-          if (collapsed) {
-            collapsed = false;
-            nav.style.height = ''; nav.style.marginBottom = '';
-            nav.style.removeProperty('--np');
-            nav.classList.remove('row-gone');
-            setNavH();
-          }
-          return;
-        }
-        if (!collapsed) { measure(); collapsed = true; }
-        var d = (h0 - h1) * p;
-        nav.style.height = (h0 - d) + 'px';
-        nav.style.marginBottom = (-d) + 'px';
-        nav.style.setProperty('--np', p);
-        nav.classList.toggle('row-gone', p >= 1);
-      }
-      addEventListener('scroll', applyProgress, { passive: true });
-      addEventListener('resize', function() {
-        if (collapsed) { collapsed = false; nav.style.removeProperty('--np'); nav.classList.remove('row-gone'); nav.style.height = ''; nav.style.marginBottom = ''; setNavH(); }
-        applyProgress();
-      });
-      applyProgress();
+      setNav();
+      new ResizeObserver(setNav).observe(nav);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(setNav);
+      addEventListener('resize', setNav);
     })();
 
     document.querySelectorAll('.v3d').forEach(initViewer);
