@@ -1171,15 +1171,59 @@
       cone: function() { return new THREE.ConeGeometry(.8, 1.8, 6); }
     };
 
+    // Egyetlen közös WebGL renderer szolgálja ki az összes nézőt: a böngészők csak kb. 8–16 WebGL-kontextust
+    // engednek egyszerre (telefonon kevesebbet), a többit eldobják. A renderer képét minden képkockán a néző
+    // saját 2D vásznára másoljuk, így az oldal rétegezése, lekerekítése és a hint ugyanúgy működik, mint eddig.
+    var shared = (function() {
+      var r = new THREE.WebGLRenderer({ antialias: true, alpha: true }),
+          dpr = Math.min(window.devicePixelRatio || 1, 2),
+          W = 0, H = 0;
+      r.setPixelRatio(1); // a méreteket mi adjuk meg eszközpixelben, így a másolás pixelpontos
+      r.outputEncoding = THREE.sRGBEncoding;
+      r.setClearColor(0x000000, 0);
+      r.setScissorTest(true);
+      r.domElement.addEventListener('webglcontextlost', function(e) { e.preventDefault(); });
+
+      return {
+        dpr: dpr,
+        // A közös rajzfelület a legnagyobb néző méretére nő (zsugorodni nem kell)
+        ensure: function(pw, ph) {
+          if (pw <= W && ph <= H) return;
+          W = Math.max(W, pw);
+          H = Math.max(H, ph);
+          r.setSize(W, H, false);
+        },
+        // Kirajzolja az adott nézőt a közös felület tetejére, majd átmásolja a néző vászonára
+        draw: function(v) {
+          r.setViewport(0, H - v.ph, v.pw, v.ph);
+          r.setScissor(0, H - v.ph, v.pw, v.ph);
+          r.render(v.scene, v.cam);
+          v.ctx.clearRect(0, 0, v.pw, v.ph);
+          v.ctx.drawImage(r.domElement, 0, 0, v.pw, v.ph, 0, 0, v.pw, v.ph);
+        }
+      };
+    })();
+
+    var views = [];
+
+    // Egyetlen animációs ciklus: csak a képernyőn lévő nézők renderelődnek
+    (function loop() {
+      requestAnimationFrame(loop);
+      for (var i = 0; i < views.length; i++) {
+        var v = views[i];
+        if (!v.vis || !v.pw) continue;
+        v.controls.update();
+        shared.draw(v);
+      }
+    })();
+
     function initViewer(el) {
-      var r = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-      r.setPixelRatio(Math.min(devicePixelRatio, 2));
-      el.appendChild(r.domElement);
+      var canvas = document.createElement('canvas');
+      el.appendChild(canvas);
 
       var s = new THREE.Scene(),
           cam = new THREE.PerspectiveCamera(40, 1, .1, 100);
       cam.position.set(0, .5, 4.2);
-      r.outputEncoding = THREE.sRGBEncoding;
 
       // Modellenkénti fényerő: data-light="0.6" a fényeket 60%-ra veszi (alapértelmezés: 1)
       var lk = parseFloat(el.dataset.light) || 1;
@@ -1204,7 +1248,7 @@
         cam.add(fill);
       }
 
-      var c = new THREE.OrbitControls(cam, r.domElement);
+      var c = new THREE.OrbitControls(cam, canvas);
       c.enableDamping = true;
       c.enablePan = false;
       c.autoRotate = true;
@@ -1243,34 +1287,40 @@
         holder.add(o);
       }
 
-      var shape = shapes[el.dataset.shape || 'knot']();
-      setModel(new THREE.Mesh(shape, new THREE.MeshStandardMaterial({ color: el.dataset.color || '#ff4f81', roughness: .45, metalness: .1 })));
+      // Helyettesítő alakzat, amíg a .glb be nem töltődik (utána felszabadítjuk)
+      var placeholder = new THREE.Mesh(
+        shapes[el.dataset.shape || 'knot'](),
+        new THREE.MeshStandardMaterial({ color: el.dataset.color || '#ff4f81', roughness: .45, metalness: .1 })
+      );
+      setModel(placeholder);
 
-      var loader = new THREE.GLTFLoader();
       if (el.dataset.src) {
-        loader.load(el.dataset.src, function(g) { setModel(g.scene); }, undefined, function() {});
+        new THREE.GLTFLoader().load(el.dataset.src, function(g) {
+          setModel(g.scene);
+          placeholder.geometry.dispose();
+          placeholder.material.dispose();
+        }, undefined, function() {});
       }
 
-      var vis = false;
-      new IntersectionObserver(function(e) { vis = e[0].isIntersecting; }).observe(el);
+      var view = { canvas: canvas, ctx: canvas.getContext('2d'), scene: s, cam: cam, controls: c, vis: false, pw: 0, ph: 0 };
+      views.push(view);
+
+      new IntersectionObserver(function(e) { view.vis = e[0].isIntersecting; }).observe(el);
 
       function size() {
         var w = el.clientWidth, h = el.clientHeight;
         if (!w || !h) return;
-        r.setSize(w, h, false);
+        view.pw = Math.floor(w * shared.dpr);
+        view.ph = Math.floor(h * shared.dpr);
+        canvas.width = view.pw;
+        canvas.height = view.ph;
+        shared.ensure(view.pw, view.ph);
         cam.aspect = w / h;
         cam.updateProjectionMatrix();
       }
 
       new ResizeObserver(size).observe(el);
       size();
-
-      (function loop() {
-        requestAnimationFrame(loop);
-        if (!vis) return;
-        c.update();
-        r.render(s, cam);
-      })();
     }
 
     // A menüsáv tényleges magassága (telefonon két soros), ehhez igazodik a nyitóblokk és az ugrás
