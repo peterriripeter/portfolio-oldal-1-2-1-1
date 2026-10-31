@@ -883,10 +883,12 @@
       nav a.cta { grid-row: 2; grid-column: 2; justify-self: center; padding: .25rem .8rem; font-size: .85rem; letter-spacing: .03em; }
       #lang-btn { grid-row: 2; grid-column: 3; justify-self: end; }
       .nav-links a { justify-self: center; font-size: .85rem; letter-spacing: .03em; }
-      /* A linkek sora van felül: a menüsáv negatív "top" értékkel tapad, így görgetéskor a linkek sora
-         magától kicsúszik, a név és a gombok sora pedig marad. Nincs JS-es méretezés, ezért iPhone-on
-         a böngésző alsó sávjának ki-be csúszása sem tudja összezavarni. */
-      nav { overflow: hidden; top: var(--nav-top, -42px); }
+      /* A linkek sora van felül. A menüsáv alapból teljesen látszik (top: 0). Amint a nyitóblokk elhagyja
+         a képernyőt (a 3D Art blokknál tartunk), a menüsáv negatív "top" értékkel tapad, így a linkek sora
+         kicsúszik, a név és a gombok sora pedig marad. Csak a tapadási pozíció változik, az oldal
+         elrendezése nem, ezért iPhone-on a böngésző alsó sávja sem tudja összezavarni. */
+      nav { overflow: hidden; top: 0; transition: top .3s ease; }
+      html.nav-compact nav { top: var(--nav-top, -42px); }
 
       /* A What can I do opciói szűk kijelzőn is egy sorban maradnak. */
       .chips { flex-wrap: nowrap; gap: .3rem; }
@@ -1441,10 +1443,15 @@
         if (mq.matches) document.documentElement.style.setProperty('--nav-top', -(lang.offsetTop - 6) + 'px');
         else document.documentElement.style.removeProperty('--nav-top');
       }
+      // A linkek sora akkor csúszik ki, amikor a nyitóblokk teljesen elhagyta a képernyőt
+      var heroGone = false, hero = document.getElementById('about');
+      function applyCompact() { document.documentElement.classList.toggle('nav-compact', heroGone && mq.matches); }
+      new IntersectionObserver(function(e) { heroGone = !e[0].isIntersecting && e[0].boundingClientRect.top < 0; applyCompact(); }, { rootMargin: '-40% 0px 0px 0px' }).observe(hero); // 40%: ennyivel korábban indul, mint a nyitóblokk teljes elhagyása
+
       setNav();
       new ResizeObserver(setNav).observe(nav);
       if (document.fonts && document.fonts.ready) document.fonts.ready.then(setNav);
-      addEventListener('resize', setNav);
+      addEventListener('resize', function() { setNav(); applyCompact(); });
     })();
 
     document.querySelectorAll('.v3d').forEach(initViewer);
