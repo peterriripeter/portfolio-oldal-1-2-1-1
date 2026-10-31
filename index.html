@@ -1207,15 +1207,68 @@
     var views = [];
 
     // Egyetlen animációs ciklus: csak a képernyőn lévő nézők renderelődnek
+    var dlgEl = document.getElementById('dlg');
     (function loop() {
       requestAnimationFrame(loop);
+      if (dlgEl && dlgEl.open) return; // a felugró videó mögött nem rajzolunk
       for (var i = 0; i < views.length; i++) {
         var v = views[i];
-        if (!v.vis || !v.pw) continue;
+        if (!v.vis || !v.pw || !v.ready) continue;
         v.controls.update();
         shared.draw(v);
       }
     })();
+
+    // ---- Memóriakezelés (iPhone-on a sok betöltött modell textúrája miatt fagyott be) ----
+    // Csak a képernyőn lévő modellek vannak a memóriában, a többit felszabadítjuk, a textúrákat pedig
+    // lekicsinyítjük: telefonon 1024 px, gépen 2048 px a felső határ.
+    var MAX_TEX = window.matchMedia('(pointer: coarse)').matches ? 1024 : 2048;
+    var TEX_KEYS = ['map', 'normalMap', 'roughnessMap', 'metalnessMap', 'aoMap', 'emissiveMap', 'bumpMap', 'alphaMap', 'lightMap', 'displacementMap'];
+
+    function materialsOf(o) {
+      return o.material ? (Array.isArray(o.material) ? o.material : [o.material]) : [];
+    }
+
+    function releaseImage(im) {
+      if (!im) return;
+      if (im.close) im.close(); // ImageBitmap
+      if (im instanceof HTMLCanvasElement) { im.width = 0; im.height = 0; } // iOS-en így szabadul fel a vászon memóriája
+    }
+
+    function disposeObject(root) {
+      root.traverse(function(o) {
+        if (o.geometry) o.geometry.dispose();
+        materialsOf(o).forEach(function(m) {
+          TEX_KEYS.forEach(function(k) {
+            if (m[k]) { releaseImage(m[k].image); m[k].dispose(); }
+          });
+          m.dispose();
+        });
+      });
+    }
+
+    function shrinkTextures(root, max) {
+      var seen = new Set();
+      root.traverse(function(o) {
+        materialsOf(o).forEach(function(m) {
+          TEX_KEYS.forEach(function(k) {
+            var t = m[k], im = t && t.image;
+            if (!t || seen.has(t)) return;
+            seen.add(t);
+            var w = im && (im.naturalWidth || im.width), h = im && (im.naturalHeight || im.height);
+            if (!w || !h || Math.max(w, h) <= max) return;
+            var sc = max / Math.max(w, h),
+                cv = document.createElement('canvas');
+            cv.width = Math.max(1, Math.round(w * sc));
+            cv.height = Math.max(1, Math.round(h * sc));
+            cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height);
+            releaseImage(im);
+            t.image = cv;
+            t.needsUpdate = true;
+          });
+        });
+      });
+    }
 
     function initViewer(el) {
       var canvas = document.createElement('canvas');
@@ -1261,7 +1314,6 @@
       s.add(holder);
 
       function setModel(o) {
-        holder.clear();
         var b = new THREE.Box3().setFromObject(o),
             sz = b.getSize(new THREE.Vector3()),
             ct = b.getCenter(new THREE.Vector3());
@@ -1287,25 +1339,55 @@
         holder.add(o);
       }
 
-      // Helyettesítő alakzat, amíg a .glb be nem töltődik (utána felszabadítjuk)
+      // Helyettesítő alakzat: csak akkor látszik, ha nincs .glb, vagy a betöltése nem sikerült
       var placeholder = new THREE.Mesh(
         shapes[el.dataset.shape || 'knot'](),
         new THREE.MeshStandardMaterial({ color: el.dataset.color || '#ff4f81', roughness: .45, metalness: .1 })
       );
       setModel(placeholder);
 
-      if (el.dataset.src) {
-        new THREE.GLTFLoader().load(el.dataset.src, function(g) {
-          setModel(g.scene);
-          placeholder.geometry.dispose();
-          placeholder.material.dispose();
-        }, undefined, function() {});
-      }
+      var hasSrc = !!el.dataset.src,
+          isStage = !!el.closest('.stage'),
+          model = null, loading = false, timer = 0;
+      placeholder.visible = !hasSrc;
 
-      var view = { canvas: canvas, ctx: canvas.getContext('2d'), scene: s, cam: cam, controls: c, vis: false, pw: 0, ph: 0 };
+      var view = { canvas: canvas, ctx: canvas.getContext('2d'), scene: s, cam: cam, controls: c, vis: false, ready: !hasSrc, pw: 0, ph: 0 };
       views.push(view);
 
-      new IntersectionObserver(function(e) { view.vis = e[0].isIntersecting; }).observe(el);
+      // A modell csak akkor töltődik be, amikor a néző a képernyőre kerül
+      function loadModel() {
+        if (!hasSrc || model || loading) return;
+        loading = true;
+        new THREE.GLTFLoader().load(el.dataset.src, function(g) {
+          loading = false;
+          if (!view.vis && !isStage) { disposeObject(g.scene); return; } // közben már elhagyta a képernyőt
+          shrinkTextures(g.scene, MAX_TEX);
+          model = g.scene;
+          setModel(model);
+          view.ready = true;
+        }, undefined, function() {
+          loading = false;
+          placeholder.visible = true;
+          view.ready = true;
+        });
+      }
+
+      // Ha a néző kikerül a képernyőről, a modell felszabadul (a nyitóblokk portréja megmarad)
+      function unloadModel() {
+        if (!model) return;
+        holder.remove(model);
+        disposeObject(model);
+        model = null;
+        view.ready = false;
+        view.ctx.clearRect(0, 0, view.canvas.width, view.canvas.height);
+      }
+
+      new IntersectionObserver(function(e) {
+        view.vis = e[e.length - 1].isIntersecting;
+        clearTimeout(timer);
+        if (view.vis) loadModel();
+        else if (!isStage) timer = setTimeout(unloadModel, 2000);
+      }).observe(el);
 
       function size() {
         var w = el.clientWidth, h = el.clientHeight;
