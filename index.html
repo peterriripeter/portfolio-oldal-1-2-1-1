@@ -3,227 +3,1463 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Péter Egri – Coming soon</title>
-  <link rel="icon" href="icon.png">
+  <link rel="icon" type="image/png" href="icon.png">
+  <title>peteregri.com</title>
+
+  <!-- Külső betűtípusok betöltése -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500&family=Barlow+Condensed:wght@600;700;800&family=Pixelify+Sans:wght@700&display=swap" rel="stylesheet">
+
   <style>
     :root {
       --bg: #ffffff;
       --text: #0a0a0a;
+      --hot: #0a0a0a;
+      --ice: #2aa7d8;
+      --on-hot: #fff;
+      --surface: #bfe6f6;
+      --line: rgba(10,10,10,.16);
       --mute: #3b4a52;
-      --blue: #bfe6f6;
-      --accent: #2aa7d8;
-      --ghost-dots: #E0607E;
-      --ghost-fill: #f7e3e3;
+      --fh: 'Barlow Condensed', system-ui, sans-serif;
+      --fb: 'Barlow', system-ui, sans-serif;
+      --hw: 800;
+      --r: 16px;
+      --rl: 22px;
+      --rb: 99px;
+      --bw: 0px;
+      --bc: transparent;
+      --sh: 7px 7px 0 #0a0a0a;
+      --shh: 10px 10px 0 #0a0a0a;
+      --bsh: 3px 4px 0 #0a0a0a;
       color-scheme: light;
       box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
     }
-    *, *::before, *::after { box-sizing: inherit; }
-    html, body { height: 100%; margin: 0; }
+
+    *, *::before, *::after {
+      box-sizing: inherit;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: calc(var(--nav-h, 56px) + 14px);
+    }
+
     body {
-      background: var(--bg);
+      margin: 0;
+      background: #f0f0ef;
       color: var(--text);
-      font: 400 1.05rem/1.6 'Barlow', system-ui, sans-serif;
-      overflow-x: hidden;
+      font: 400 1.05rem/1.65 var(--fb);
     }
-    :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
-    .page {
+    h1, h2, h3 {
+      font-family: var(--fh);
+      line-height: 1.05;
+      margin: 0;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--ice);
+      outline-offset: 3px;
+    }
+
+    /* Navigáció */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      gap: 1.4rem;
+      justify-content: flex-end;
+      padding: .9rem 5vw;
+      background: color-mix(in srgb, var(--bg) 85%, transparent);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+      overflow-x: auto;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: var(--mute);
+      white-space: nowrap;
+      font-size: .95rem;
+    }
+
+    nav a:hover {
+      color: var(--text);
+    }
+
+    nav a.brand {
+      margin-right: auto;
+      color: var(--text);
+      font: var(--hw) 1rem/1 var(--fh);
+      letter-spacing: -.01em;
+      padding: .35rem 0;
+    }
+
+    nav a.cta {
+      color: var(--on-hot);
+      background: var(--hot);
+      padding: .1rem .9rem;
+      border-radius: var(--rb);
+      font-weight: 500;
+    }
+
+    /* Nyelvváltó gomb stílusa */
+    #lang-btn {
+      cursor: pointer;
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--mute);
+      padding: .3rem .8rem;
+      border-radius: var(--rb);
+      font: inherit;
+      font-size: .9rem;
+      transition: all .2s;
+    }
+    #lang-btn:hover {
+      color: var(--text);
+      border-color: var(--text);
+    }
+
+    section {
+      padding: 4rem 5vw;
+      max-width: 1500px;
+      margin: 0 auto;
+    }
+
+    h2 {
+      font-size: clamp(2rem, 5vw, 3.6rem);
+      font-weight: var(--hw);
+      margin-bottom: .6rem;
+    }
+
+    /* Hero szekció */
+    #about {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+      height: calc(100svh - var(--nav-h, 56px));
+      min-height: 520px;
+      padding: 1.5rem 5vw 8rem;
       position: relative;
-      isolation: isolate;
-      height: 100vh;
-      height: 100svh;
-      display: grid;
-      place-items: center;
-      padding: max(1.2rem, env(safe-area-inset-top)) 5vw max(1.2rem, env(safe-area-inset-bottom));
-      overflow: hidden;
     }
 
-    /* Középső rész */
-    main {
-      display: grid;
-      justify-items: center;
-      align-content: center;
-      gap: clamp(.4rem, 2svh, 1rem);
-      width: 100%;
-      padding: .5rem 0;
+    .scroll {
+      position: absolute;
+      left: 50%;
+      bottom: 1rem;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .3rem;
+      color: var(--mute);
+      text-decoration: none;
+      font-size: .85rem;
+      transition: opacity .3s;
     }
+
+    .scroll:hover {
+      color: var(--text);
+    }
+
+    .scroll svg {
+      width: 26px;
+      height: 26px;
+      stroke: var(--ice);
+      fill: none;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      animation: bob 1.6s ease-in-out infinite;
+    }
+
+    .scroll.hide {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(7px); }
+    }
+
+    #about h1 {
+      font-size: clamp(2.6rem, min(8vw, 12svh), 5.8rem);
+      font-weight: var(--hw);
+      letter-spacing: -.03em;
+    }
+
+    .btn.hot {
+      background: var(--hot);
+      color: var(--on-hot);
+    }
+
+
+    #about p {
+      color: var(--mute);
+      max-width: 46ch;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+      margin-top: 1.5rem;
+      padding: 0;
+      list-style: none;
+    }
+
+    .tags li {
+      border: 1px solid var(--line);
+      border-radius: var(--rb);
+      padding: .2rem .9rem;
+      font-size: .9rem;
+    }
+
     .stage {
       position: relative;
-      width: min(86vw, 40svh);
+      width: min(100%, 68svh);
+      justify-self: center;
       aspect-ratio: 1;
-      border-radius: 22px;
-      background-color: var(--blue);
-      background-image: radial-gradient(circle, rgba(255,255,255,.55) 1px, transparent 1.4px);
-      background-size: 4px 4px;
-      box-shadow: 9px 9px 0 var(--text);
+      border-radius: var(--rl);
     }
+
     .stage::before {
       content: "";
       position: absolute;
       inset: 0;
-      border-radius: inherit;
       pointer-events: none;
-      background-image:
-        linear-gradient(rgba(10,10,10,.08) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(10,10,10,.08) 1px, transparent 1px);
+      border-radius: inherit;
+      background-image: linear-gradient(rgba(255,255,255,.14) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.14) 1px, transparent 1px);
       background-size: 10% 10%;
     }
+
     .v3d {
       position: relative;
-      z-index: 1;
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+      border-radius: inherit;
+    }
+
+    .v3d:active {
+      cursor: grabbing;
+    }
+
+    .v3d canvas {
+      display: block;
       width: 100%;
       height: 100%;
       border-radius: inherit;
-      cursor: grab;
-      touch-action: pan-y;
     }
-    .v3d:active { cursor: grabbing; }
-    .v3d canvas { display: block; width: 100%; height: 100%; border-radius: inherit; }
-    .v3d.drop { outline: 3px dashed var(--accent); }
 
-    /* Cím + pixeles szellemszöveg (mint a portfólión: a szellemszöveg a cím fölött, kicsit ráér) */
-    .title { --g: clamp(2.2rem, 9vw, 8rem); position: relative; margin-top: calc(var(--g) * .64); margin-bottom: clamp(1.2rem, 5svh, 3rem); }
-    .title::before {
-      content: "COMING SOON";
+    .stage .v3d {
+      z-index: 1;
+    }
+
+    /* Fogd és forgasd jelzés a portré modellen */
+    .hint {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      transition: opacity .5s, transform .5s;
+    }
+
+    .stage.touched .hint {
+      opacity: 0;
+      transform: scale(.94);
+    }
+
+    .hint-hand {
+      position: absolute;
+      top: 60%;
+      left: 50%;
+      width: clamp(34px, 16%, 64px);
+      height: auto;
+      fill: #fff;
+      stroke: #0a0a0a;
+      stroke-width: 1.4;
+      stroke-linejoin: round;
+      filter: drop-shadow(3px 4px 0 #0a0a0a);
+      transform: translate(-50%, -50%);
+      animation: hint-swipe 2.4s cubic-bezier(.45, 0, .55, 1) infinite alternate;
+    }
+
+    .hint-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: clamp(18px, 7%, 30px);
+      height: auto;
+      fill: none;
+      stroke: #0a0a0a;
+      stroke-width: 3;
+      stroke-linecap: square;
+    }
+
+    .hint-l { left: 9%; animation: hint-pulse-l 1.2s ease-in-out infinite; }
+    .hint-r { right: 9%; animation: hint-pulse-r 1.2s ease-in-out infinite; }
+    .hint-u { top: 9%; left: 50%; transform: translateX(-50%); animation: hint-pulse-u 1.2s ease-in-out infinite; }
+
+    .hint-tag {
       position: absolute;
       left: 50%;
-      top: -.64em;
-      transform: translateX(-50%);
-      z-index: -1;
-      white-space: nowrap;
-      pointer-events: none;
-      font: 700 var(--g)/.9 'Pixelify Sans', monospace;
+      bottom: -15px;
+      background: #fff;
+      color: #0a0a0a;
+      border: 2px solid #0a0a0a;
+      border-radius: 99px;
+      padding: .4em 1.2em;
+      font: 700 clamp(.8rem, 1.4vw + .35rem, 1.15rem)/1 'Pixelify Sans', monospace;
       letter-spacing: .06em;
-      background-image: radial-gradient(circle, var(--ghost-dots) 35%, transparent 53%), linear-gradient(var(--ghost-fill), var(--ghost-fill));
-      background-size: max(2px, calc(var(--g) * .031)) max(2px, calc(var(--g) * .031)), 100% 100%;
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      -webkit-text-fill-color: transparent;
+      white-space: nowrap;
+      box-shadow: 3px 4px 0 #0a0a0a;
+      transform: translateX(-50%) rotate(-3deg);
+      animation: hint-wobble 2.2s ease-in-out infinite alternate;
     }
-    .title h1 {
-      margin: 0;
-      font: 800 clamp(2.6rem, 8vw, 5.4rem)/.95 'Barlow Condensed', system-ui, sans-serif;
-      letter-spacing: .02em;
-      text-transform: uppercase;
-      text-align: center;
-    }
-    .tagline { margin: 0; margin-top: clamp(1.2rem, 5svh, 3rem); color: var(--mute); text-align: center; font-size: clamp(.8rem, .9vw + .35rem, 1.2rem); }
 
-    /* Nagy, magas képernyőn a nagy távolság marad, kisebb képernyőn (telefon, alacsony ablak) összenyomódik, hogy ne kelljen görgetni */
-    @media (min-width: 821px) and (min-height: 800px) {
-      main { gap: 10rem; padding: 1.5rem 0; }
+    @keyframes hint-swipe {
+      from { left: 30%; transform: translate(-50%, -50%) rotate(-16deg); }
+      to   { left: 70%; transform: translate(-50%, -50%) rotate(16deg); }
     }
-    @media (max-width: 820px), (max-height: 799px) {
-      .title { margin-bottom: clamp(.6rem, 2.5svh, 1.2rem); }
-      .tagline { margin-top: clamp(.6rem, 2.5svh, 1.2rem); }
-      .stage { width: min(78vw, 38svh); box-shadow: 7px 7px 0 var(--text); }
+
+    @keyframes hint-pulse-l {
+      0%, 100% { opacity: .35; transform: translateY(-50%) translateX(0); }
+      50%      { opacity: 1;   transform: translateY(-50%) translateX(-6px); }
     }
-    @media (max-height: 640px) and (orientation: landscape) {
-      .stage { width: min(40vw, 46svh); }
-      .title h1 { font-size: clamp(2rem, 6vw, 3.4rem); }
+
+    @keyframes hint-pulse-r {
+      0%, 100% { opacity: .35; transform: translateY(-50%) translateX(0); }
+      50%      { opacity: 1;   transform: translateY(-50%) translateX(6px); }
+    }
+
+    @keyframes hint-pulse-u {
+      0%, 100% { opacity: .35; transform: translateX(-50%) translateY(0); }
+      50%      { opacity: 1;   transform: translateX(-50%) translateY(-6px); }
+    }
+
+    @keyframes hint-wobble {
+      from { transform: translateX(-50%) rotate(-3deg); }
+      to   { transform: translateX(-50%) translateY(-3px) rotate(2deg); }
+    }
+
+    /* 3D Art & Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.4rem;
+    }
+
+    .thumb {
+      all: unset;
+      cursor: pointer;
+      box-sizing: border-box;
+    }
+
+    .card, .thumb, .lc {
+      display: block;
+      background: var(--surface);
+      border: var(--bw) solid var(--bc);
+      border-radius: var(--r);
+      overflow: hidden;
+      box-shadow: var(--sh);
+      transition: transform .2s, border-color .2s, box-shadow .2s;
+    }
+
+    .card:hover, .thumb:hover, .lc:hover {
+      transform: translateY(-4px);
+      border-color: var(--hot);
+      box-shadow: var(--shh);
+    }
+
+    .thumb:focus-visible, .lc:focus-visible {
+      transform: translateY(-4px);
+      border-color: var(--hot);
+      outline: 2px solid var(--ice);
+      outline-offset: 3px;
+    }
+
+    .lc {
+      cursor: pointer;
+    }
+
+    .cap {
+      display: block;
+      padding: .85rem 1rem;
+    }
+
+    .cap strong {
+      display: block;
+      font-weight: 500;
+      font-size: 1rem;
+      line-height: 1.3;
+    }
+
+    .cap small {
+      display: block;
+      color: var(--mute);
+      font-size: .98rem;
+      margin-top: .1rem;
+    }
+
+    .card .box {
+      aspect-ratio: 4/3;
+      position: relative;
+    }
+
+    .card .box::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size: 32px 32px;
+      background-position: center;
+    }
+
+    .card .box .v3d {
+      z-index: 1;
+    }
+
+    .sub {
+      font-size: 1.3rem;
+      font-weight: 500;
+      margin: 3.5rem 0 1.2rem;
+    }
+
+    .vid {
+      position: relative;
+      aspect-ratio: 16/9;
+      display: grid;
+      place-items: center;
+      color: var(--mute);
+      font-size: .9rem;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .vid video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Logók */
+    .logos {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 230px));
+      justify-content: start;
+      gap: 1.2rem;
+    }
+
+    .logo {
+      position: relative;
+      aspect-ratio: 1;
+      background: var(--text);
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+    }
+
+
+    .logo > * {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      transition: opacity .25s;
+    }
+
+    .logo .anim {
+      opacity: 0;
+    }
+
+    .lc:hover .anim, .lc:focus-visible .anim {
+      opacity: 1;
+    }
+
+    .lc:hover .still, .lc:focus-visible .still {
+      opacity: 0;
+    }
+
+    /* Videók */
+    .thumbs {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.4rem;
+    }
+
+    .vid img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .thumb .vid::after {
+      content: "";
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      background: var(--hot) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%2313101f' d='M9 6.5v11l9-5.5z'/%3E%3C/svg%3E") center/60% no-repeat;
+      position: absolute;
+    }
+
+    dialog {
+      border: 0;
+      padding: 0;
+      background: #000;
+      border-radius: var(--r);
+      width: min(960px, 92vw);
+      overflow: hidden;
+    }
+
+    dialog::backdrop {
+      background: rgba(8, 6, 16, .8);
+      backdrop-filter: blur(6px);
+    }
+
+    dialog .vid {
+      border-radius: 0;
+    }
+
+    /* Álló (9:16) GIF a felugró ablakban */
+    dialog.portrait {
+      width: min(92vw, calc(88vh * var(--ar, .5625)));
+    }
+
+    dialog.portrait .vid {
+      aspect-ratio: var(--ar, .5625);
+    }
+
+    dialog img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    dialog iframe, dialog video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    dialog button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 2;
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: var(--rb);
+      padding: .3rem 1rem;
+      cursor: pointer;
+      font: inherit;
+    }
+
+    /* Hire / Kapcsolat */
+    #hire {
+      text-align: center;
+      padding-bottom: 1rem;
+    }
+
+    .btn {
+      display: inline-block;
+      background: var(--bg);
+      color: var(--text);
+      padding: 1rem 2.2rem;
+      border-radius: var(--rb);
+      text-decoration: none;
+      font-weight: 500;
+      box-shadow: var(--bsh);
+      transition: transform .2s;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+    }
+
+    .hv5 {
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+      border-radius: var(--rl);
+      padding: clamp(2.5rem, 7vw, 5rem) 1.5rem;
+    }
+
+    .hv5::before {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      inset: 0;
+      pointer-events: none;
+      background-image: linear-gradient(rgba(255,255,255,.14) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.14) 1px, transparent 1px);
+      background-size: 40px 40px;
+      background-position: center;
+    }
+
+    .hv5 h2 {
+      font-size: clamp(2.2rem, 6vw, 4.6rem);
+      margin-bottom: 1rem;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .6rem;
+      justify-content: center;
+      margin: 2rem 0 1.5rem;
+    }
+
+    .chip {
+      cursor: pointer;
+      border: 1px solid var(--mute);
+      border-radius: var(--rb);
+      padding: .4rem 1.1rem;
+      font: inherit;
+      color: var(--text);
+      background: transparent;
+      transition: border-color .15s, box-shadow .15s;
+    }
+
+    .links {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      margin-top: 5rem;
+      flex-wrap: wrap;
+    }
+
+    .links a {
+      color: var(--mute);
+    }
+
+    .links a:hover {
+      color: var(--text);
+    }
+
+    footer {
+      text-align: center;
+      color: var(--mute);
+      font-size: .85rem;
+      padding: 0 0 3rem;
+    }
+
+    /* ---- 6 · Prezentáció stílus (egri_peter_prezentacio.pdf) ---- */
+    h1, h2 { text-transform: uppercase; letter-spacing: .02em; }
+    .cap strong { text-transform: uppercase; letter-spacing: .03em; font-weight: 700; font-size: 1.1rem; }
+    .sub { font: 500 .95rem var(--fb); text-transform: uppercase; letter-spacing: .06em; }
+    nav a { text-transform: uppercase; letter-spacing: .05em; font-family: var(--fh); font-weight: 600; font-size: 1.05rem; }
+    nav a.cta { background: #E0607E; color: #0a0a0a; font-weight: 600; box-shadow: 2px 3px 0 #0a0a0a; }
+    section { position: relative; isolation: isolate; }
+    section::before { position: absolute; left: 0; right: 0; top: 1.2rem; z-index: -1; overflow: hidden; white-space: nowrap; pointer-events: none;
+      --g: clamp(1.9rem, 6.4vw, 5.6rem);
+      font: 700 var(--g)/.9 'Pixelify Sans', monospace; letter-spacing: .02em;
+      background-image: radial-gradient(circle, #9fd0e4 35%, transparent 53%), linear-gradient(#e3f1f7, #e3f1f7);
+      background-size: max(2px, calc(var(--g) * .031)) max(2px, calc(var(--g) * .031)), 100% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
+
+    html[lang="hu"] #art::before { content: "3D MUNKÁK"; }
+    html[lang="hu"] #logo::before { content: "LOGÓK"; }
+    html[lang="hu"] #video::before { content: "VIDEÓZÁS"; }
+    html[lang="hu"] #other::before { content: "EGYÉB"; }
+    #art::before { content: "3D ART"; }
+    #logo::before { content: "LOGOS"; }
+    #video::before { content: "FILMING"; }
+    #other::before { content: "OTHER"; }
+
+    .card, .thumb, .lc, .stage, .hv5 {
+      background-image: radial-gradient(circle, rgba(255,255,255,.55) 1px, transparent 1.4px); background-size: 4px 4px; background-color: #bfe6f6; }
+    .hv5 { background-color: #E0607E; box-shadow: 8px 8px 0 #0a0a0a; border: 0; }
+    .stage { box-shadow: 9px 9px 0 #0a0a0a; }
+    .stage::before { background-image: linear-gradient(rgba(10,10,10,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(10,10,10,.08) 1px, transparent 1px); }
+    .btn { background: #bfe6f6; color: #0a0a0a; text-transform: uppercase; letter-spacing: .06em; font-family: var(--fh); font-weight: 600; font-size: 1.05rem; }
+    .btn.hot { background: #0a0a0a; color: #fff; box-shadow: 3px 4px 0 #bfe6f6; }
+    .tags li { background: #bfe6f6; border: 0; color: #0a0a0a; }
+    /* Programok: egyedi kapszula- és betűszínek */
+    .tags .tag-blender { background: #EA7600; color: #ffffff; }
+    .tags .tag-unreal  { background: #0a0a0a; color: #ffffff; }
+    .tags .tag-adobe   { background: #FA0C00; color: #ffffff; }
+    .tags .tag-maya    { background: #16A8CB; color: #ffffff; }
+    .chip { background: #fff; border: 2px solid #0a0a0a; color: #0a0a0a; }
+    .chip[aria-pressed="true"] { background: #0a0a0a; border-color: #0a0a0a; color: #fff; }
+    .chip:hover, .chip[aria-pressed="true"]:hover { border-color: #2aa7d8; box-shadow: 0 0 0 2px #2aa7d8; }
+    .lc .logo { background: #0a0a0a; }
+    .card .box { background: #d8dfe3; }
+    .card .box::before { background-image: linear-gradient(rgba(10,10,10,.12) 1px, transparent 1px), linear-gradient(90deg, rgba(10,10,10,.12) 1px, transparent 1px); }
+    .vid { background: #0a0a0a; color: #bfe6f6; }
+    .thumb .vid::after { background-color: #fff; }
+    .links a:hover { color: #2aa7d8; }
+
+
+    /* HELLO szellemszöveg az "I'm Péter" cím mögött */
+    #about > div:first-child { position: relative; --g: clamp(4.4rem, min(20.1vw, 40svh), 15rem); }
+    #about > div:first-child::before { content: "HELLO"; position: absolute; left: max(-12vw, calc(-1 * (max(0px, (100vw - 1280px) / 2) + 5vw))); top: -.64em; z-index: -1; white-space: nowrap; pointer-events: none;
+      font: 700 var(--g)/.9 'Pixelify Sans', monospace; letter-spacing: .06em;
+      background-image: radial-gradient(circle, #9fd0e4 35%, transparent 53%), linear-gradient(#e3f1f7, #e3f1f7);
+      background-size: max(2px, calc(var(--g) * .031)) max(2px, calc(var(--g) * .031)), 100% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
+    nav a.brand { cursor: pointer; background: transparent; border: 1px solid var(--line); color: var(--mute); padding: .3rem .8rem; border-radius: var(--rb); font: inherit; font-size: .9rem; letter-spacing: normal; text-transform: none; transition: all .2s; }
+    .btn, nav a.cta { transition: transform .2s, box-shadow .2s; }
+    .btn:hover { transform: translateY(-4px); box-shadow: 6px 8px 0 #0a0a0a; }
+    .btn.hot:hover { box-shadow: 6px 8px 0 #2aa7d8; }
+    nav a.cta:hover { transform: translateY(-2px); box-shadow: 4px 6px 0 #0a0a0a; color: #0a0a0a; }
+    nav a.brand:hover { color: var(--text); border-color: var(--text); }
+
+    /* 3D modellek: pörgethető szalag, a kártyák fix helyekre ugranak */
+    .carousel { position: relative; }
+    .track {
+      display: flex;
+      gap: 1.4rem;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      scroll-padding-left: 6px;
+      padding: 8px 14px 16px 6px;
+      scrollbar-width: none;
+      overscroll-behavior-x: contain;
+    }
+    .track::-webkit-scrollbar { display: none; }
+    .track > .card {
+      flex: 0 0 calc((100% - 20px - 2 * 1.4rem) / 3);
+      min-width: 0;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+    }
+    .track.dragging { scroll-snap-type: none; scroll-behavior: auto; cursor: grabbing; user-select: none; }
+    .car-ctl { display: flex; align-items: center; justify-content: space-between; gap: .8rem; margin-top: .6rem; }
+    .car-btn { cursor: pointer; border: 0; font-size: 1.2rem; line-height: 1; padding: .6rem 1.3rem; }
+    .car-btn:disabled { opacity: .35; cursor: default; pointer-events: none; }
+    @media (max-width: 820px) {
+      .track { gap: .8rem; }
+      .track > .card { flex-basis: 90%; }
+    }
+
+    /* Reszponzív nézetek */
+    @media (max-width: 820px) {
+      #about > div:first-child { --g: clamp(2.8rem, min(16vw, 15svh), 12rem); margin-top: calc(var(--g) * .64); }
+      #about > div:first-child::before { left: 50%; transform: translateX(-50%); }
+      #about {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+        align-content: center;
+        gap: 3rem;
+        min-height: 0;
+        text-align: center;
+      }
+      #about p {
+        margin: .8rem auto 0;
+        font-size: .95rem;
+      }
+      .stage {
+        order: -1;
+        width: min(70vw, 32svh);
+      }
+      .tags {
+        display: none;
+      }
+      .btn {
+        padding: .7rem 1.4rem;
+      }
+      section {
+        padding: 2.5rem 5vw;
+      }
+      .grid, .thumbs, .logos {
+        grid-template-columns: repeat(2, 1fr);
+        gap: .8rem;
+      }
+      .cap {
+        padding: .6rem .8rem;
+      }
+      .cap small {
+        font-size: .75rem;
+      }
+      .thumb .vid::after {
+        width: 40px;
+        height: 40px;
+      }
+      .sub {
+        margin-top: 2.5rem;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .logos {
+        grid-template-columns: repeat(3, 1fr);
+        gap: .5rem;
+      }
+      .cap {
+        padding: .5rem .6rem;
+      }
+      .cap small {
+        display: block;
+        font-size: .72rem;
+        line-height: 1.3;
+      }
+    }
+
+    /* Telefon: a pixeles szellemszövegek ne érjenek a képernyő széléhez, a logók legyenek kisebbek */
+    @media (max-width: 820px) {
+      /* a szellemszöveg 1.25-szörös méretű, és nagyrészt a cím mögé kerül (cím teteje = 2.5rem) */
+      section::before { left: 5vw; right: 5vw; --g: calc(clamp(1.9rem, 6.4vw, 5.6rem) * 2); top: calc(2.5rem - var(--g) * .25 - 15px); }
+      .logos {
+        grid-template-columns: repeat(3, minmax(0, 150px));
+        justify-content: start;
+      }
+    }
+    @media (max-width: 520px) {
+      .logos {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: .7rem;
+      }
+    }
+
+    /* Javítások: nyelvváltó gomb, videókártyák igazítása, logókártyák szövege */
+    #lang-btn { white-space: nowrap; flex-shrink: 0; }
+    nav > * { flex-shrink: 0; }
+
+    .thumbs { align-items: stretch; grid-auto-rows: 1fr; }
+    .thumb {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-self: stretch;
+    }
+    .thumb .cap { flex: 1; }
+
+    @media (max-width: 520px) {
+      .cap { padding: .55rem .6rem; }
+      .cap strong {
+        font-size: .95rem;
+        letter-spacing: 0;
+        overflow-wrap: anywhere;
+        hyphens: auto;
+      }
+    }
+
+    /* Telefon: a menüsáv két sorba rendeződik, így nem lóg le a képernyőről */
+    @media (max-width: 620px) {
+      /* Rács: felső sor = név (balra), Get in touch (pontosan középen), EN/HU (jobbra); alsó sor = 4 menüpont */
+      nav {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        align-items: center;
+        gap: .55rem .3rem;
+        padding: .6rem 5vw;
+      }
+      nav::after { display: none; }
+      nav a.brand { margin-right: 0; grid-row: 1; grid-column: 1 / 3; justify-self: start; }
+      nav a.cta { grid-row: 1; grid-column: 1 / -1; justify-self: center; padding: .25rem .8rem; font-size: .85rem; letter-spacing: .03em; }
+      #lang-btn { grid-row: 1; grid-column: 3 / 5; justify-self: end; }
+      nav a:not(.brand):not(.cta) { grid-row: 2; justify-self: center; font-size: .85rem; letter-spacing: .03em; }
+      /* A második sor a görgetéssel együtt mozog: a --np (0–1) változót a JS állítja */
+      nav { overflow: hidden; }
+      nav a:not(.brand):not(.cta) { opacity: clamp(0, calc(1 - var(--np, 0) * 1.6), 1); transform: translateY(calc(var(--np, 0) * -14px)); }
+      nav.row-gone a:not(.brand):not(.cta) { visibility: hidden; pointer-events: none; }
+      nav.measure a:not(.brand):not(.cta) { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="page">
-    <main>
-      <div class="title"><h1>Coming soon</h1></div>
-      <div class="stage">
-        <div class="v3d" data-src="portre.glb" aria-label="Rotatable 3D portrait"></div>
+
+  <!-- Navigáció -->
+  <nav>
+    <a class="brand" href="#about" data-en="PÉTER EGRI" data-hu="EGRI PÉTER">PÉTER EGRI</a>
+    <a href="#art" data-en="3D Art" data-hu="3D Munkák">3D Art</a>
+    <a href="#logo" data-en="Logos" data-hu="Logók">Logos</a>
+    <a href="#video" data-en="Filming" data-hu="Videózás">Filming</a>
+    <a href="#other" data-en="Other" data-hu="Egyéb">Other</a>
+    <a class="cta" href="#hire" data-en="Get in touch" data-hu="Kapcsolat">Get in touch</a>
+    <button id="lang-btn">EN / HU</button>
+  </nav>
+
+  <!-- Rólam / Hero szekció -->
+  <section id="about">
+    <div>
+      <h1 data-en="I'm Peti," data-hu="Peti vagyok,">I'm Peti,</h1>
+      <p 
+        data-en="I'm a media designer from Hungary. <br> I mostly focus on 3D, but I also do logo designs, animations and filming works. <br> I'm currently doing my master's at Budapest <br> Metropolitan University." 
+        data-hu="Végzett média designer, kreatív szakember vagyok, főterületem a 3D, de logókat, animációkat és videózást is vállalok. <br> Jelenleg a Budapesti Metropolitan Egyetem mesterszakos hallgatója vagyok."
+        >I'm a media designer from Hungary. <br> I mostly focus on 3D, but I also do logo designs, animations and filming works. <br> I'm currently doing my master's at Budapest <br> Metropolitan University.
+      </p>
+      <ul class="tags">
+        <li class="tag-blender">Blender</li>
+        <li class="tag-unreal">Unreal Engine</li>
+        <li class="tag-adobe">Adobe</li>
+        <li class="tag-maya">Maya</li>
+      </ul>
+    </div>
+
+    <div class="stage">
+      <div class="v3d" data-src="portre.glb" aria-label="Forgatható 3D modell"></div>
+      <div class="hint" aria-hidden="true">
+        <svg class="hint-arrow hint-l" viewBox="0 0 24 24"><path d="M15 4 7 12l8 8"/><path d="M21 4 13 12l8 8" opacity=".45"/></svg>
+        <svg class="hint-arrow hint-u" viewBox="0 0 24 24"><path d="M4 15l8-8 8 8"/><path d="M4 21l8-8 8 8" opacity=".45"/></svg>
+        <svg class="hint-hand" viewBox="0 0 24 24"><path d="M9 11V5a1.5 1.5 0 0 1 3 0v5.5l5.6 1.4A2 2 0 0 1 19 14v3.5a5 5 0 0 1-5 5h-2.2a5 5 0 0 1-4-2L4 15.3a1.6 1.6 0 0 1 2.5-2L9 15z"/></svg>
+        <svg class="hint-arrow hint-r" viewBox="0 0 24 24"><path d="M9 4l8 8-8 8"/><path d="M3 4l8 8-8 8" opacity=".45"/></svg>
+        <span class="hint-tag"><span data-en="GRAB &amp; ROTATE" data-hu="FOGD ÉS FORGASD">GRAB &amp; ROTATE</span></span>
       </div>
-      <p class="tagline">© 2026 Péter Egri</p>
-    </main>
+    </div>
 
-  </div>
+    <a class="scroll" href="#art">
+      <span data-en="Scroll down" data-hu="Görgess lejjebb">Scroll down</span>
+      <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/><path d="M6 4l6 6 6-6" opacity=".45"/></svg>
+    </a>
+  </section>
 
+  <!-- 3D Art szekció -->
+  <section id="art">
+    <h2 data-en="3D Art" data-hu="3D Munkák">3D Art</h2>
+    <h3 class="sub" data-en="3D models" data-hu="3D modellezés">3D models</h3>
+    <div class="carousel" id="modelCarousel">
+      <div class="track" tabindex="0" aria-label="3D models">
+        
+        <article class="card">
+          <div class="box"><div class="v3d" data-free data-src="szek.glb" data-shape="cone" data-color="#9b7bff" data-scale="1.2"></div></div>
+          <div class="cap"><strong data-en="Victorian chair" data-hu="Viktoriánus szék">Victorian chair</strong><small>Blender · Substance Painter</small></div>
+        </article>
+
+        
+        <article class="card">
+          <div class="box"><div class="v3d" data-free data-src="kanape.glb" data-shape="ico" data-color="#7bd88f" data-scale="1.2"></div></div>
+          <div class="cap"><strong data-en="Victorian sofa" data-hu="Viktoriánus kanapé">Victorian sofa</strong><small>Blender · Substance Painter</small></div>
+        </article>
+        
+        <article class="card">
+          <div class="box"><div class="v3d" data-free data-src="gramophone.glb" data-light="1" data-shape="ico" data-color="#62e3ff" data-scale="1.1"></div></div>
+          <div class="cap"><strong data-en="Gramophone" data-hu="Gramofon">Gramophone</strong><small>Blender</small></div>
+        </article>
+
+        <article class="card">
+          <div class="box"><div class="v3d" data-free data-src="kemiaasztal.glb" data-shape="knot" data-color="#62e3ff"></div></div>
+          <div class="cap"><strong data-en="Alchemy desk" data-hu="Alkimista asztal">Alchemy desk</strong><small>Blender · Substance Painter</small></div>
+        </article>
+        
+        
+        
+        <article class="card">
+          <div class="box"><div class="v3d" data-free data-src="mcgraw.glb" data-shape="torus" data-color="#ffb347" data-scale="1.2"></div></div>
+          <div class="cap"><strong data-en="Feathers McGraw" data-hu="Tollas McKárt">Feathers McGraw</strong><small>Blender</small></div>
+        </article>
+        
+        <article class="card">
+          <div class="box"><div class="v3d" data-free data-src="hegedu.glb" data-shape="knot" data-color="#ff4f81"></div></div>
+          <div class="cap"><strong data-en="Violin" data-hu="Hegedű">Violin</strong><small>Blender · Substance Painter</small></div>
+        </article>
+
+      <article class="card">
+        <div class="box"><div class="v3d" data-free data-src="kapolna.glb" data-shape="cone" data-color="#9b7bff" data-scale="1.2"></div></div>
+        <div class="cap"><strong data-en="Monopteros" data-hu="Monopterosz">Monopteros</strong><small>Blender · Substance Painter</small></div>
+      </article>
+
+      <article class="card">
+        <div class="box"><div class="v3d" data-free data-light=".5" data-src="kandallo.glb" data-shape="torus" data-color="#ffd166"></div></div>
+        <div class="cap"><strong data-en="Fireplace" data-hu="Kandalló">Fireplace</strong><small>Blender · Substance Painter</small></div>
+      </article>
+
+      <article class="card">
+        <div class="box"><div class="v3d" data-free data-src="pad.glb" data-shape="torus" data-color="#ff4f81" data-scale="1.5"></div></div>
+        <div class="cap"><strong data-en="Bench" data-hu="Pad">Bench</strong><small>Blender · Substance Painter</small></div>
+      </article>
+      
+      <article class="card">
+        <div class="box"><div class="v3d" data-free data-src="kisasztal.glb" data-shape="ico" data-color="#ffb347" data-scale="1.2"></div></div>
+        <div class="cap"><strong data-en="Victorian table" data-hu="Viktoriánus asztal">Victorian table</strong><small>Blender · Substance Painter</small></div>
+      </article>
+      </div>
+      <div class="car-ctl">
+        <button class="btn car-btn" id="carPrev" aria-label="Previous models">&larr;</button>
+        <button class="btn car-btn" id="carNext" aria-label="Next models">&rarr;</button>
+      </div>
+    </div>
+
+    <h3 class="sub" data-en="3D videos" data-hu="3D videók">3D videos</h3>
+    <div class="grid">
+      <button class="thumb" data-src="https://www.youtube.com/embed/RhpGv7j8R2o?autoplay=1&amp;rel=0" data-title="VICERLON ENVIRONMENTS">
+        <div class="vid"><img src="https://img.youtube.com/vi/RhpGv7j8R2o/hqdefault.jpg" alt="" loading="lazy"></div>
+        <span class="cap"><strong  data-en="diploma project" data-hu="diplomamunka">diploma project</strong><small data-en="Victorian environments" data-hu="Viktoriánus helyszínek"> Victorian environments </small></span>
+      </button>
+
+      <button class="thumb" data-src="https://www.youtube.com/embed/5O7R4ESYZvw?autoplay=1&amp;rel=0" data-title="Homokora">
+        <div class="vid"><img src="https://img.youtube.com/vi/5O7R4ESYZvw/hqdefault.jpg" alt="" loading="lazy"></div>
+        <span class="cap"><strong data-en="3D backgrounds" data-hu="3D hátterek">3D backgrounds</strong><small>Homokóra (YT)</small></span>
+      </button>
+
+      <button class="thumb" data-src="dynamic.mp4" data-title="Dynamic Machines">
+        <div class="vid"><video src="dynamic.mp4#t=16.5" muted playsinline preload="metadata"></video></div>
+        <span class="cap"><strong data-en="3D Animation" data-hu="3D Animáció">3D Animation</strong><small>Dynamic Machines Challenge</small></span>
+      </button>
+
+    </div>
+  </section>
+
+      
+
+  <!-- Logók szekció -->
+  <section id="logo">
+    <h2 data-en="Logos" data-hu="Logók">Logos</h2>
+    <h3 class="sub" data-en="Design & Animation" data-hu="Design és Animáció">Design & Animation</h3>
+    <div class="logos">
+      <div class="lc" tabindex="0">
+        <div class="logo">
+          <img class="still" src="zu_white.png" alt="Zu Üvegékszer">
+          <img class="anim" src="zu_black.png" alt="Zu Üvegékszer">
+        </div>
+        <div class="cap"><strong>Design</strong><small data-en="Zu Üvegékszer · Jewellery" data-hu="Zu Üvegékszer · Ékszer">Zu Üvegékszer · Jewellery</small></div>
+      </div>
+
+      <div class="lc" tabindex="0">
+        <div class="logo">
+          <img class="still" src="railstaffy.png" alt="RailStaffy">
+          <img class="anim" src="railstaffy.gif" alt="RailStaffy">
+        </div>
+        <div class="cap"><strong data-en="Design & Animation" data-hu="Design és Animáció">Design & Animation</strong><small data-en="RailStaffy · Staffing" data-hu="RailStaffy · Munkaközvetítés">RailStaffy · Staffing</small></div>
+      </div>
+
+      <div class="lc" tabindex="0">
+        <div class="logo">
+          <img class="still" src="agility.png" alt="AgilityAthletiX">
+          <img class="anim" src="agility.gif" alt="AgilityAthletiX">
+        </div>
+        <div class="cap"><strong data-en="Animation" data-hu="Animáció">Animation</strong><small>AgilityAthletiX · Sport</small></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Videós munkák szekció -->
+  <section id="video">
+    <h2 data-en="Filming" data-hu="Videózás">Filming</h2>
+    <h3 class="sub" data-en="Shooting & Editing" data-hu="Felvétel és Vágás">Shooting & Editing</h3>
+    <div class="thumbs">
+      <button class="thumb" data-src="https://www.youtube.com/embed/UAYwp4epZL4?autoplay=1&amp;rel=0" data-title="PISTI">
+        <div class="vid"><img src="https://img.youtube.com/vi/UAYwp4epZL4/hqdefault.jpg" alt="" loading="lazy"></div>
+        <span class="cap"><strong data-en="Shooting & Editing" data-hu="Felvétel és Vágás">Shooting & Editing</strong><small data-en="PISTI · Diploma project of Zsófia Osgyányi" data-hu="PISTI · Osgyányi Zsófia diplomamunkája">PISTI · Diploma project of Zsófia Osgyányi</small></span>
+      </button>
+
+      <button class="thumb" data-src="https://www.youtube.com/embed/9LPeLm7g3Uw?autoplay=1&amp;rel=0" data-title="11 SZOBA">
+        <div class="vid"><img src="https://img.youtube.com/vi/9LPeLm7g3Uw/hqdefault.jpg" alt="" loading="lazy"></div>
+        <span class="cap"><strong data-en="Shooting & Editing" data-hu="Felvétel és Vágás">Shooting & Editing</strong><small data-en="11-es Szoba · concert recording" data-hu="11-es Szoba · koncertfelvétel">11-ES SZOBA concert recording</small></span>
+      </button>
+
+      <button class="thumb" data-src="https://www.youtube.com/embed/hQkC2Fblnro?autoplay=1&amp;rel=0" data-title="ROTENBURG">
+        <div class="vid"><img src="https://img.youtube.com/vi/hQkC2Fblnro/hqdefault.jpg" alt="" loading="lazy"></div>
+        <span class="cap"><strong data-en="Editing" data-hu="Vágás">Editing</strong><small data-en="The Guitar Ensemble of the Liszt Academy · concert recording" data-hu="Zeneakadémia Gitárzenekara · koncertfelvétel">The Guitar Ensemble of the Liszt Academy · concert recording</small></span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Egyéb szekció -->
+  <section id="other">
+    <h2 data-en="Other" data-hu="Egyéb">Other</h2>
+    <h3 class="sub" data-en="Anything else" data-hu="Bármi más">Anything else</h3>
+    <div class="thumbs">
+      <button class="thumb" data-src="https://www.youtube.com/embed/u-1yeODd4IY?autoplay=1&amp;rel=0" data-title="HERCULES VS TOLDI">
+        <div class="vid"><img src="https://img.youtube.com/vi/u-1yeODd4IY/hqdefault.jpg" alt="" loading="lazy"></div>
+        <span class="cap"><strong data-en="Animated Video Clip" data-hu="Animált Videóklipp">Animated Video Clip </strong><small data-en="Hercules vs Toldi · Rap Battle" data-hu="Herkules vs Toldi · Rapcsata">Hercules vs Toldi · Rap Battle</small></span>
+      </button>
+
+      
+
+      <button class="thumb" data-src="https://www.youtube.com/embed/r55Sm7cyWdQ?autoplay=1&amp;rel=0" data-title="BCS INTRO">
+        <div class="vid"><img src="https://img.youtube.com/vi/r55Sm7cyWdQ/hqdefault.jpg" alt="" loading="lazy"></div>
+        <span class="cap"><strong data-en="Title Sequence Recreation" data-hu="Főcím-újraalkotás">Title Sequence Recreation </strong><small data-en="Better Call Saul · Rump_ (YT)" data-hu="Better Call Saul · Rump_ (YT)">Better Call Saul · Rump_ (YT)</small></span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Videó lejátszó párbeszédablak -->
+  <dialog id="dlg">
+    <button id="close" data-en="Close" data-hu="Bezár">Close</button>
+    <div class="vid" id="player"></div>
+  </dialog>
+
+  <!-- Hire me / Kapcsolat szekció -->
+  <section id="hire">
+    <div class="hv5">
+      <h2 data-en="What can I do for you?" data-hu="Miben segíthetek?">What can I do for you?</h2>
+
+      <div class="chips" id="pick">
+        <button class="chip" aria-pressed="false">3D</button>
+        <button class="chip" aria-pressed="false" data-en="Logo" data-hu="Logó">Logo</button>
+        <button class="chip" aria-pressed="false" data-en="Filming" data-hu="Videózás">Filming</button>
+        <button class="chip" aria-pressed="false" data-en="Other" data-hu="Egyéb">Other</button>
+      </div>
+
+      <a class="btn hot" id="pickBtn" href="mailto:egripeteregri@gmail.com?subject=Projekt" data-en="Send me an email" data-hu="Írj egy emailt">Send me an email</a>
+    </div>
+
+    <div class="links">
+      <a href="https://www.instagram.com/peterr_egrii/" target="_blank" rel="noopener noreferrer">Instagram</a>
+      <a href="https://www.behance.net/peteregri" target="_blank" rel="noopener noreferrer">Behance</a>
+      <a href="https://egripeter.artstation.com" target="_blank" rel="noopener noreferrer">ArtStation</a>
+      <a href="https://www.linkedin.com/in/p%C3%A9ter-egri-671b4b381/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+    </div>
+  </section>
+
+  <footer data-en="© 2026 Péter Egri" data-hu="© 2026 Egri Péter">© 2026 Péter Egri</footer>
+
+
+  <!-- Külső JavaScript könyvtárak -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+
+  <!-- Alkalmazás logika -->
   <script>
-    // A portre.glb fájlnak ennek a html-nek a mappájában kell lennie.
-    // Ha a fájl nem található, egy tartalék alakzat jelenik meg, így az oldal nem marad üresen.
-    (function () {
-      var el = document.querySelector('.v3d');
 
-      var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-      renderer.outputEncoding = THREE.sRGBEncoding;
-      el.appendChild(renderer.domElement);
+    // ---- Nyelvváltó logika ----
+    let currentLang = 'en';
+    const langBtn = document.getElementById('lang-btn');
 
-      var scene = new THREE.Scene();
-      var camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
-      camera.position.set(0, 0.5, 4.2);
+    // Ez a függvény frissíti az elemeket a megadott nyelvre
+    function updateLanguage(lang) {
+      document.documentElement.setAttribute('lang', lang);
 
-      scene.add(new THREE.AmbientLight(0xffffff, 0.95));
-      scene.add(new THREE.HemisphereLight(0xffffff, 0x6b6490, 0.35));
-      var sun = new THREE.DirectionalLight(0xffffff, 0.55);
-      sun.position.set(3, 4, 3);
-      scene.add(sun);
-
-      var controls = new THREE.OrbitControls(camera, renderer.domElement);
-      controls.enableDamping = true;
-      controls.enablePan = false;
-      controls.autoRotate = !matchMedia('(prefers-reduced-motion: reduce)').matches;
-      controls.autoRotateSpeed = 2;
-      controls.minDistance = 2.5;
-      controls.maxDistance = 7;
-      controls.maxPolarAngle = Math.PI / 2; // alulról nem nézhető
-
-      var holder = new THREE.Group();
-      scene.add(holder);
-
-      function setModel(obj) {
-        holder.clear();
-        var box = new THREE.Box3().setFromObject(obj);
-        var size = box.getSize(new THREE.Vector3());
-        var center = box.getCenter(new THREE.Vector3());
-        var k = 2 / Math.max(size.x, size.y, size.z);
-        obj.scale.multiplyScalar(k);
-        obj.position.sub(center.multiplyScalar(k));
-        holder.add(obj);
-      }
-
-      function fallback() {
-        setModel(new THREE.Mesh(
-          new THREE.TorusKnotGeometry(0.7, 0.26, 160, 24),
-          new THREE.MeshStandardMaterial({ color: '#ff4f81', roughness: 0.45, metalness: 0.1 })
-        ));
-      }
-
-      var loader = new THREE.GLTFLoader();
-      loader.load(el.dataset.src, function (g) { setModel(g.scene); }, undefined, fallback);
-
-      // Teszteléshez: egy .glb fájl ráhúzható a modellre
-      el.addEventListener('dragover', function (e) { e.preventDefault(); el.classList.add('drop'); });
-      el.addEventListener('dragleave', function () { el.classList.remove('drop'); });
-      el.addEventListener('drop', function (e) {
-        e.preventDefault();
-        el.classList.remove('drop');
-        var f = e.dataTransfer.files[0];
-        if (!f) return;
-        f.arrayBuffer().then(function (buf) {
-          loader.parse(buf, '', function (g) { setModel(g.scene); });
-        });
+      document.querySelectorAll('[data-en]').forEach(el => {
+        if (lang === 'hu' && el.dataset.hu) {
+          el.innerHTML = el.dataset.hu;
+        } else if (lang === 'en' && el.dataset.en) {
+          el.innerHTML = el.dataset.en;
+        }
       });
 
-      function resize() {
+      if (typeof updateMailto === 'function') updateMailto();
+    }
+
+    // Gombnyomásra váltás
+    langBtn.addEventListener('click', () => {
+      currentLang = currentLang === 'en' ? 'hu' : 'en';
+      updateLanguage(currentLang);
+    });
+
+    // Oldal betöltődésekor azonnal lefut, hogy ne ugráljon a szöveg
+    document.addEventListener('DOMContentLoaded', () => {
+      updateLanguage(currentLang);
+    });
+
+    // ---- 3D nézők ----
+    var shapes = {
+      knot: function() { return new THREE.TorusKnotGeometry(.7, .26, 160, 24); },
+      ico: function() { return new THREE.IcosahedronGeometry(1, 0); },
+      torus: function() { return new THREE.TorusGeometry(.8, .3, 24, 64); },
+      cone: function() { return new THREE.ConeGeometry(.8, 1.8, 6); }
+    };
+
+    function initViewer(el) {
+      var r = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      r.setPixelRatio(Math.min(devicePixelRatio, 2));
+      el.appendChild(r.domElement);
+
+      var s = new THREE.Scene(),
+          cam = new THREE.PerspectiveCamera(40, 1, .1, 100);
+      cam.position.set(0, .5, 4.2);
+      r.outputEncoding = THREE.sRGBEncoding;
+
+      // Modellenkénti fényerő: data-light="0.6" a fényeket 60%-ra veszi (alapértelmezés: 1)
+      var lk = parseFloat(el.dataset.light) || 1;
+
+      if (el.closest('.stage')) {
+        // Portré modell (nyitóblokk): visszafogottabb, rögzített fények
+        s.add(new THREE.AmbientLight(0xffffff, .95 * lk));
+        s.add(new THREE.HemisphereLight(0xffffff, 0x6b6490, .35 * lk));
+        var d = new THREE.DirectionalLight(0xffffff, .55 * lk);
+        d.position.set(3, 4, 3);
+        s.add(d);
+      } else {
+        // 3D Art modellek: a fények a kamerával együtt mozognak, így forgatáskor sem marad sötét oldal
+        s.add(new THREE.AmbientLight(0xffffff, 1.1 * lk));
+        s.add(new THREE.HemisphereLight(0xffffff, 0xb9c6cf, .7 * lk));
+        s.add(cam);
+        var key = new THREE.DirectionalLight(0xffffff, .75 * lk);
+        key.position.set(2, 3, 4);
+        cam.add(key);
+        var fill = new THREE.DirectionalLight(0xffffff, .45 * lk);
+        fill.position.set(-3, -.5, 2);
+        cam.add(fill);
+      }
+
+      var c = new THREE.OrbitControls(cam, r.domElement);
+      c.enableDamping = true;
+      c.enablePan = false;
+      c.autoRotate = true;
+      c.autoRotateSpeed = -2;
+      c.minDistance = 2.5;
+      c.maxDistance = 7;
+      c.maxPolarAngle = el.hasAttribute('data-free') ? Math.PI : Math.PI / 2;
+
+      var holder = new THREE.Group();
+      s.add(holder);
+
+      function setModel(o) {
+        holder.clear();
+        var b = new THREE.Box3().setFromObject(o),
+            sz = b.getSize(new THREE.Vector3()),
+            ct = b.getCenter(new THREE.Vector3());
+        var k;
+        if (el.closest('.stage')) {
+          // Portré (nyitóblokk): eredeti méretezés
+          k = 2 / Math.max(sz.x, sz.y, sz.z);
+        } else {
+          // Kártyák: a forgás miatt a vízszintes átló számít, ezért a széles, alacsony modellek
+          // (pad, kanapé) nagyobbak lesznek, a magas, keskenyek pedig kitöltik a keret magasságát
+          var asp = (el.clientWidth && el.clientHeight) ? el.clientWidth / el.clientHeight : 4 / 3,
+              dist = cam.position.length(),
+              t = 2 * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)),
+              diag = Math.sqrt(sz.x * sz.x + sz.z * sz.z) || 1,
+              kw = t * dist * asp * .78 / diag,
+              kh = .9 * t * dist / ((sz.y || 1) + .45 * t * diag);
+          k = Math.min(kw, kh);
+        }
+        // Finomhangolás: data-scale="1.2" az adott modellt 20%-kal nagyítja
+        k *= parseFloat(el.dataset.scale) || 1;
+        o.scale.multiplyScalar(k);
+        o.position.sub(ct.multiplyScalar(k));
+        holder.add(o);
+      }
+
+      var shape = shapes[el.dataset.shape || 'knot']();
+      setModel(new THREE.Mesh(shape, new THREE.MeshStandardMaterial({ color: el.dataset.color || '#ff4f81', roughness: .45, metalness: .1 })));
+
+      var loader = new THREE.GLTFLoader();
+      if (el.dataset.src) {
+        loader.load(el.dataset.src, function(g) { setModel(g.scene); }, undefined, function() {});
+      }
+
+      var vis = false;
+      new IntersectionObserver(function(e) { vis = e[0].isIntersecting; }).observe(el);
+
+      function size() {
         var w = el.clientWidth, h = el.clientHeight;
         if (!w || !h) return;
-        renderer.setSize(w, h, false);
-        camera.aspect = w / h;
-        camera.updateProjectionMatrix();
+        r.setSize(w, h, false);
+        cam.aspect = w / h;
+        cam.updateProjectionMatrix();
       }
-      new ResizeObserver(resize).observe(el);
-      resize();
+
+      new ResizeObserver(size).observe(el);
+      size();
 
       (function loop() {
         requestAnimationFrame(loop);
-        controls.update();
-        renderer.render(scene, camera);
+        if (!vis) return;
+        c.update();
+        r.render(s, cam);
       })();
+    }
+
+    // A menüsáv tényleges magassága (telefonon két soros), ehhez igazodik a nyitóblokk és az ugrás
+    (function() {
+      var nav = document.querySelector('nav');
+      var collapsed = false;
+      function setNavH() { if (!collapsed) document.documentElement.style.setProperty('--nav-h', nav.offsetHeight + 'px'); }
+      setNavH();
+      new ResizeObserver(setNavH).observe(nav);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(setNavH);
+
+      // Telefonon a menü második sora a görgetéssel együtt csúszik fel és halványul el:
+      // a "Scroll down" jelzés eltűnésénél (scrollY = 40) indul, és START + RANGE görgetésnél tűnik el teljesen.
+      // A negatív alsó margó miatt a tartalom közben nem mozdul el.
+      var START = 40, RANGE = 1000;
+      var mq = window.matchMedia('(max-width: 620px)');
+      var h0 = 0, h1 = 0;
+      function measure() {
+        nav.style.height = ''; nav.style.marginBottom = '';
+        h0 = nav.offsetHeight;
+        nav.classList.add('measure');
+        h1 = nav.offsetHeight;
+        nav.classList.remove('measure');
+      }
+      function applyProgress() {
+        var p = mq.matches ? Math.min(1, Math.max(0, (window.scrollY - START) / RANGE)) : 0;
+        if (p === 0) {
+          if (collapsed) {
+            collapsed = false;
+            nav.style.height = ''; nav.style.marginBottom = '';
+            nav.style.removeProperty('--np');
+            nav.classList.remove('row-gone');
+            setNavH();
+          }
+          return;
+        }
+        if (!collapsed) { measure(); collapsed = true; }
+        var d = (h0 - h1) * p;
+        nav.style.height = (h0 - d) + 'px';
+        nav.style.marginBottom = (-d) + 'px';
+        nav.style.setProperty('--np', p);
+        nav.classList.toggle('row-gone', p >= 1);
+      }
+      addEventListener('scroll', applyProgress, { passive: true });
+      addEventListener('resize', function() {
+        if (collapsed) { collapsed = false; nav.style.removeProperty('--np'); nav.classList.remove('row-gone'); nav.style.height = ''; nav.style.marginBottom = ''; setNavH(); }
+        applyProgress();
+      });
+      applyProgress();
     })();
+
+    document.querySelectorAll('.v3d').forEach(initViewer);
+
+    // A "fogd és forgasd" jelzés eltűnik, amint a látogató először hozzáér a modellhez
+    var heroStage = document.querySelector('.stage');
+    if (heroStage) {
+      heroStage.addEventListener('pointerdown', function() {
+        heroStage.classList.add('touched');
+      }, { once: true, capture: true });
+    }
+
+    // ---- 3D modellek szalag ----
+    (function() {
+      var track = document.querySelector('#modelCarousel .track'),
+          prev = document.getElementById('carPrev'),
+          next = document.getElementById('carNext'),
+          cards = track.querySelectorAll('.card');
+
+      function step() {
+        return cards.length > 1 ? cards[1].offsetLeft - cards[0].offsetLeft : track.clientWidth;
+      }
+      function update() {
+        var max = track.scrollWidth - track.clientWidth,
+            atStart = track.scrollLeft <= 2,
+            atEnd = track.scrollLeft >= max - 2;
+        prev.disabled = atStart;
+        next.disabled = atEnd;
+      }
+      function go(dir) { track.scrollBy({ left: dir * step(), behavior: 'smooth' }); }
+      prev.onclick = function() { go(-1); };
+      next.onclick = function() { go(1); };
+      track.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update);
+
+      // Egérrel húzható a szalag (a modellekre húzva a modell forog, nem a szalag)
+      var down = false, sx = 0, sl = 0;
+      track.addEventListener('pointerdown', function(e) {
+        if (e.pointerType !== 'mouse' || e.button !== 0 || e.target.closest('.v3d')) return;
+        down = true; sx = e.clientX; sl = track.scrollLeft;
+        track.classList.add('dragging');
+        track.setPointerCapture(e.pointerId);
+      });
+      track.addEventListener('pointermove', function(e) {
+        if (down) track.scrollLeft = sl - (e.clientX - sx);
+      });
+      function release() {
+        if (!down) return;
+        down = false;
+        track.classList.remove('dragging');
+        var st = step();
+        track.scrollTo({ left: Math.round(track.scrollLeft / st) * st, behavior: 'smooth' });
+      }
+      track.addEventListener('pointerup', release);
+      track.addEventListener('pointercancel', release);
+
+      update();
+    })();
+
+    // ---- Videók felugró ablakban ----
+    var dlg = document.getElementById('dlg'),
+        player = document.getElementById('player');
+
+    // Álló videó/kép esetén az ablak álló arányú lesz, a méret a fájl arányához igazodik
+    function fitDialog(w, h) {
+      if (h > w) {
+        dlg.style.setProperty('--ar', (w / h).toFixed(4));
+        dlg.classList.add('portrait');
+      }
+    }
+
+    function resetPlayer() {
+      player.innerHTML = '';
+      dlg.classList.remove('portrait');
+      dlg.style.removeProperty('--ar');
+    }
+
+    document.querySelectorAll('.thumb').forEach(function(b) {
+      b.addEventListener('click', function() {
+        var src = b.dataset.src;
+        resetPlayer();
+        if (!src) {
+          player.textContent = (currentLang === 'hu' ? 'Ide jön a videó: ' : 'Video comes here: ') + b.dataset.title;
+        } else if (/\.(gif|png|jpe?g|webp)$/i.test(src)) {
+          var im = document.createElement('img');
+          im.src = src;
+          im.alt = b.dataset.title;
+          player.appendChild(im);
+          im.onload = function() { fitDialog(im.naturalWidth, im.naturalHeight); };
+        } else if (/\.(mp4|webm)$/i.test(src)) {
+          var v = document.createElement('video');
+          v.src = src;
+          v.controls = true;
+          v.autoplay = true;
+          v.loop = true; // a videó a végén magától újraindul
+          v.playsInline = true;
+          v.addEventListener('loadedmetadata', function() { fitDialog(v.videoWidth, v.videoHeight); });
+          player.appendChild(v);
+        } else {
+          var f = document.createElement('iframe');
+          f.referrerPolicy = 'strict-origin-when-cross-origin';
+          f.src = src;
+          f.allow = 'autoplay; fullscreen; picture-in-picture; encrypted-media';
+          f.allowFullscreen = true;
+          f.title = b.dataset.title;
+          player.appendChild(f);
+        }
+        dlg.showModal();
+      });
+    });
+
+    document.getElementById('close').onclick = function() { dlg.close(); };
+    dlg.addEventListener('close', resetPlayer);
+    dlg.addEventListener('click', function(e) { if (e.target === dlg) dlg.close(); });
+
+    var chips = document.querySelectorAll('#pick .chip'),
+        pickBtn = document.getElementById('pickBtn');
+
+    function updateMailto() {
+      var sel = [].filter.call(chips, function(x) {
+        return x.getAttribute('aria-pressed') === 'true';
+      }).map(function(x) {
+        return x.textContent;
+      });
+      var subjPrefix = currentLang === 'hu' ? 'Projekt' : 'Project';
+      pickBtn.href = 'mailto:egripeteregri@gmail.com?subject=' + encodeURIComponent(subjPrefix + (sel.length ? ': ' + sel.join(', ') : ''));
+    }
+
+    chips.forEach(function(c) {
+      c.onclick = function() {
+        c.setAttribute('aria-pressed', c.getAttribute('aria-pressed') !== 'true');
+        updateMailto();
+      };
+    });
+    updateMailto();
+
+    var cue = document.querySelector('.scroll');
+    addEventListener('scroll', function() {
+      cue.classList.toggle('hide', scrollY > 40);
+    }, { passive: true });
   </script>
 </body>
 </html>
